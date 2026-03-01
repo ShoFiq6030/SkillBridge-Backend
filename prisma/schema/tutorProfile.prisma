@@ -1,0 +1,49 @@
+
+model TutorProfile {
+  id String @id @default(uuid())
+
+  /// 1–1 with User (only users with role=TUTOR should have this)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Public profile
+  headline        String? // e.g. "MERN Stack Tutor | 5+ years"
+  bio             String? // long description
+  hourlyRate      Int     @default(0)
+    currency        Currency @default(USD)
+  language        Language @default(ENGLISH)
+  experienceYears Int?
+
+  // Rating summary (cached for fast listing + sorting)
+  avgRating    Float @default(0)
+  totalReviews Int   @default(0)
+
+  // Relations
+  // subjects      TutorSubject[]   // M:N Categories via join table
+  // slots         AvailabilitySlot[]
+  // bookings      Booking[]
+  // reviews       Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([hourlyRate])
+  @@index([avgRating])
+    @@map("tutorProfiles")
+}
+
+
+enum Currency {
+  USD
+  EUR
+  BDT
+  INR
+}
+
+enum Language {
+  ENGLISH
+  BANGLA
+  HINDI
+  ARABIC
+  SPANISH
+}
