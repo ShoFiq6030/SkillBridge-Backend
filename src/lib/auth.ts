@@ -33,13 +33,34 @@ export const auth = betterAuth({
       },
     },
   },
+
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const allowedRoles = ["USER", "TUTOR"];
+          const nextRole = allowedRoles.includes((user as any).role)
+            ? (user as any).role
+            : "USER";
+
+          return {
+            data: {
+              ...user,
+              role: nextRole,
+            },
+          };
+        },
+      },
+    },
+  },
+
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
     requireEmailVerification: true,
   },
   emailVerification: {
-    sendOnSignUp: true,
+    sendOnSignUp: false,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url, token }, request) => {
       try {
