@@ -4,6 +4,7 @@ import cors from "cors";
 import { auth } from "./lib/auth";
 import { toNodeHandler } from "better-auth/node";
 import { tutorProfileRouter } from "./modules/tutorProfile/tutorProfile.router";
+import { availabilitySlotRouter } from "./modules/avaliabilitySlot/availabilitySlot.routers";
 
 const app: Application = express();
 
@@ -23,5 +24,6 @@ app.get("/", (req, res) => {
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use("/api/tutor-profile", tutorProfileRouter);
+app.use("/api/availability-slot", availabilitySlotRouter);
 
 export default app;

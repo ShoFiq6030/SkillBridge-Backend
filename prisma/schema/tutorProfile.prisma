@@ -1,4 +1,3 @@
-
 model TutorProfile {
   id String @id @default(uuid())
 
@@ -9,8 +8,8 @@ model TutorProfile {
   // Public profile
   headline        String? // e.g. "MERN Stack Tutor | 5+ years"
   bio             String? // long description
-  hourlyRate      Int     @default(0)
-    currency        Currency @default(USD)
+  hourlyRate      Int      @default(0)
+  currency        Currency @default(USD)
   language        Language @default(ENGLISH)
   experienceYears Int?
 
@@ -20,7 +19,7 @@ model TutorProfile {
 
   // Relations
   // subjects      TutorSubject[]   // M:N Categories via join table
-  // slots         AvailabilitySlot[]
+  slots AvailabilitySlot[]
   // bookings      Booking[]
   // reviews       Review[]
 
@@ -29,9 +28,8 @@ model TutorProfile {
 
   @@index([hourlyRate])
   @@index([avgRating])
-    @@map("tutorProfiles")
+  @@map("tutorProfiles")
 }
-
 
 enum Currency {
   USD

@@ -1,0 +1,23 @@
+model AvailabilitySlot {
+  id String @id @default(uuid())
+
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+
+  startAt DateTime // Store in UTC
+  endAt   DateTime // Store in UTC
+
+  isBooked Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  
+
+  // Prevent exact duplicate slots
+  @@unique([tutorProfileId, startAt, endAt])
+  // Improve query performance
+  @@index([tutorProfileId])
+  @@index([startAt])
+  @@map("availability_slots")
+}
