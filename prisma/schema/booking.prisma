@@ -1,0 +1,32 @@
+model Booking {
+  id String @id @default(uuid())
+
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+
+  studentId String
+  student   User   @relation("StudentBookings", fields: [studentId], references: [id], onDelete: Cascade)
+
+  slotId String           @unique
+  slot   AvailabilitySlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  status BookingStatus @default(CONFIRMED)
+  note   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([tutorProfileId])
+  @@index([categoryId])
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}

@@ -9,10 +9,9 @@ model AvailabilitySlot {
 
   isBooked Boolean @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  studentBookings Booking[]
 
   // Prevent exact duplicate slots
   @@unique([tutorProfileId, startAt, endAt])

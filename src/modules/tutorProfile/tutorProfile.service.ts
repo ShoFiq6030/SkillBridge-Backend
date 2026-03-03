@@ -14,15 +14,13 @@ const getAllTutorProfile = async () => {
   const result = await prisma.tutorProfile.findMany({
     include: {
       user: true,
-      
+      slots: true,
     },
     where: {
       user: {
         status: "ACTIVE",
       },
     },
-    
-
   });
   return result;
 };

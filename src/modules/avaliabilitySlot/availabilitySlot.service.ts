@@ -69,6 +69,8 @@ const createAvailabilitySlot = async (
   };
 };
 
+
+
 export const availabilitySlotService = {
   createAvailabilitySlot,
 };

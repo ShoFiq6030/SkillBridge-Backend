@@ -1,0 +1,14 @@
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+  slug String @unique
+
+  // Relations
+  tutors   TutorSubject[] // M:N Tutors via join table
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
+}
