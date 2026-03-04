@@ -10,8 +10,8 @@ model Booking {
   slotId String           @unique
   slot   AvailabilitySlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
 
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  tutorSubjectId String
+  tutorSubject   TutorSubject @relation(fields: [tutorSubjectId], references: [id], onDelete: Cascade)
 
   status BookingStatus @default(CONFIRMED)
   note   String?
@@ -21,7 +21,7 @@ model Booking {
 
   @@index([studentId])
   @@index([tutorProfileId])
-  @@index([categoryId])
+  @@index([tutorSubjectId])
   @@map("bookings")
 }
 

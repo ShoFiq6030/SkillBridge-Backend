@@ -5,6 +5,9 @@ import { auth } from "./lib/auth";
 import { toNodeHandler } from "better-auth/node";
 import { tutorProfileRouter } from "./modules/tutorProfile/tutorProfile.router";
 import { availabilitySlotRouter } from "./modules/avaliabilitySlot/availabilitySlot.routers";
+import { bookingRouter } from "./modules/booking/booking.routers";
+import { categoriesRouter } from "./modules/category/category.router";
+import { tutorSubjectRouter } from "./modules/tutorSubject/tutorSubject.router";
 
 const app: Application = express();
 
@@ -24,6 +27,9 @@ app.get("/", (req, res) => {
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use("/api/tutor-profile", tutorProfileRouter);
+app.use ("/api/booking", bookingRouter);
+app.use("/api/categories", categoriesRouter);
+app.use ("/api/tutor-subject", tutorSubjectRouter);
 app.use("/api/availability-slot", availabilitySlotRouter);
 
 export default app;
