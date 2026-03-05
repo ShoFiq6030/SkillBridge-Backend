@@ -38,6 +38,17 @@ const createCategory = async (categoryData: Category) => {
   }
 };
 
+const getAllCategories = async () => {
+  try {
+    const categories = await prisma.category.findMany();
+    return categories;
+  } catch (error) {
+    console.log(error);
+    throw new Error((error as Error).message || "Failed to fetch categories");
+  }
+};
+
 export const categoriesService = {
   createCategory,
+  getAllCategories,
 };

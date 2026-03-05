@@ -9,5 +9,9 @@ router.post(
   auth(UserRole.TUTOR, UserRole.ADMIN),
   categoriesController.createCategory,
 );
+router.get(
+  "/",
+  categoriesController.getAllCategories,
+);
 
 export const categoriesRouter = router;
