@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { ListTutorsFilters, tutorProfileService } from "./tutorProfile.service";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 
-
 const createTutorProfile = async (
   req: Request,
   res: Response,
@@ -95,9 +94,59 @@ const getTutorProfile = async (
     }
 
     res.status(200).json({
-       success: true,
+      success: true,
       tutorProfile: result,
-     
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const updateTutorProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({
+        error: "Unauthorized!",
+      });
+    }
+    if (user.role !== "TUTOR") {
+      return res.status(403).json({
+        error: "Only tutors can update tutor profiles!",
+      });
+    }
+
+    const { id } = req.params;
+    const profileId = typeof id === "string" ? id : undefined;
+    if (!profileId) {
+      return res.status(400).json({
+        error: "Tutor profile ID is required",
+      });
+    }
+  
+
+    const result = await tutorProfileService.updateTutorProfile(
+      profileId,
+      user.id as string,
+      req.body,
+    );
+
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        error:
+          "Tutor profile not found or you don't have permission to update it",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Tutor profile updated successfully",
+      tutorProfile: result,
     });
   } catch (e) {
     next(e);
@@ -108,4 +157,5 @@ export const tutorProfileController = {
   createTutorProfile,
   listTutors,
   getTutorProfile,
+  updateTutorProfile,
 };

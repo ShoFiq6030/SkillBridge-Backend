@@ -11,5 +11,10 @@ router.post(
 );
 router.get("/list", tutorProfileController.listTutors);
 router.get("/:id", tutorProfileController.getTutorProfile);
+router.put(
+  "/:id",
+  auth(UserRole.TUTOR),
+  tutorProfileController.updateTutorProfile,
+);
 
 export const tutorProfileRouter = router;

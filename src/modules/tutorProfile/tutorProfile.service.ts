@@ -176,8 +176,59 @@ const getTutorProfile = async (id: string) => {
   return result;
 };
 
+const updateTutorProfile = async (
+  profileId: string,
+  userId: string,
+  payload: Partial<TutorProfile>,
+) => {
+  // Verify that the profile belongs to the user
+  const existingProfile = await prisma.tutorProfile.findUnique({
+    where: {
+      id: profileId,
+      userId: userId,
+    },
+  });
+
+
+  if (!existingProfile || existingProfile.userId !== userId) {
+    return null;
+  }
+
+  const result = await prisma.tutorProfile.update({
+    where: {
+      id: profileId,
+    },
+    data: payload,
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          image: true,
+        },
+      },
+      subjects: {
+        include: {
+          category: true,
+        },
+      },
+      slots: true,
+      reviews: {
+        select: {
+          id: true,
+          rating: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
 export const tutorProfileService = {
   createTutorProfile,
   listTutors,
   getTutorProfile,
+  updateTutorProfile,
 };
