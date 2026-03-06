@@ -10,6 +10,6 @@ router.post(
   tutorProfileController.createTutorProfile,
 );
 router.get("/list", tutorProfileController.listTutors);
-
+router.get("/:id", tutorProfileController.getTutorProfile);
 
 export const tutorProfileRouter = router;

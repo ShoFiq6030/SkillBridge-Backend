@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { ListTutorsFilters, tutorProfileService } from "./tutorProfile.service";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 
+
 const createTutorProfile = async (
   req: Request,
   res: Response,
@@ -72,7 +73,39 @@ const listTutors = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const getTutorProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const profileId = typeof id === "string" ? id : undefined;
+    if (!profileId) {
+      return res.status(400).json({
+        error: "Tutor profile ID is required",
+      });
+    }
+
+    const result = await tutorProfileService.getTutorProfile(profileId);
+    if (!result) {
+      return res.status(404).json({
+        error: "Tutor profile not found",
+      });
+    }
+
+    res.status(200).json({
+       success: true,
+      tutorProfile: result,
+     
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 export const tutorProfileController = {
   createTutorProfile,
   listTutors,
+  getTutorProfile,
 };
