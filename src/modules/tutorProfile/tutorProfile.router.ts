@@ -9,6 +9,7 @@ router.post(
   auth(UserRole.TUTOR),
   tutorProfileController.createTutorProfile,
 );
-router.get("/", tutorProfileController.getAllTutorProfile);
+router.get("/list", tutorProfileController.listTutors);
+
 
 export const tutorProfileRouter = router;

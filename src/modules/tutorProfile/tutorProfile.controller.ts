@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { tutorProfileService } from "./tutorProfile.service";
+import { ListTutorsFilters, tutorProfileService } from "./tutorProfile.service";
+import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 
 const createTutorProfile = async (
   req: Request,
@@ -28,16 +29,43 @@ const createTutorProfile = async (
   }
 };
 
-const getAllTutorProfile = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const listTutors = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // const { search } = req.query
-    // const searchString = typeof search === 'string' ? search : undefined
+    // extract search term if provided
+    const { search } = req.query;
+    const searchString = typeof search === "string" ? search : undefined;
 
-    const result = await tutorProfileService.getAllTutorProfile();
+    // pagination & sorting helpers convert page/limit/skip/sort order
+    const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(
+      req.query,
+    );
+
+    // parse numeric filters from query string values
+    const rawCategory = req.query.category;
+    const category = typeof rawCategory === "string" ? rawCategory : undefined;
+
+    const rawMin = req.query.minHourlyRate;
+    const rawMax = req.query.maxHourlyRate;
+    const rawExp = req.query.experienceYears;
+
+    const parsedMin = typeof rawMin === "string" ? Number(rawMin) : undefined;
+    const parsedMax = typeof rawMax === "string" ? Number(rawMax) : undefined;
+    const parsedExperience =
+      typeof rawExp === "string" ? Number(rawExp) : undefined;
+
+    const result = await tutorProfileService.listTutors({
+      search: searchString,
+      category,
+      minHourlyRate: parsedMin,
+      maxHourlyRate: parsedMax,
+      experienceYears: parsedExperience,
+      page,
+      limit,
+      skip,
+      sortBy,
+      sortOrder,
+    });
+
     res.status(200).json(result);
   } catch (e) {
     next(e);
@@ -46,5 +74,5 @@ const getAllTutorProfile = async (
 
 export const tutorProfileController = {
   createTutorProfile,
-  getAllTutorProfile,
+  listTutors,
 };
