@@ -44,6 +44,35 @@ const createBookingService = async (bookingData: Booking, userId: string) => {
   }
 };
 
+const getBookingsByStudentIdService = async (studentId: string) => {
+  try {
+    const bookings = await prisma.booking.findMany({
+      where: {
+        studentId,
+      },
+      include: {
+        tutorProfile: true,
+        slot: true,
+        tutorSubject: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return {
+      success: true,
+      data: bookings,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: (error as Error).message || "Failed to fetch bookings",
+    };
+  }
+};
+
 export const bookingService = {
   createBookingService,
+  getBookingsByStudentIdService,
 };
