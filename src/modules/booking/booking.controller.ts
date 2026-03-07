@@ -1,7 +1,11 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { bookingService } from "./booking.service";
 
-const createBooking = async (req: Request, res: Response) => {
+const createBooking = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const user = req.user;
     if (!user) {
@@ -18,11 +22,7 @@ const createBooking = async (req: Request, res: Response) => {
     }
     res.status(201).json(result);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      error: (error as Error).message || "Failed to create booking",
-    });
+    next(error);
   }
 };
 

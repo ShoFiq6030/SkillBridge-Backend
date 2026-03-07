@@ -12,4 +12,12 @@ router.post(
 
 router.get("/:tutorProfileId", tutorSubjectController.getTutorSubject);
 
+router.get("/single/:id", tutorSubjectController.getTutorSubjectById);
+
+router.delete(
+  "/:id",
+  auth(UserRole.TUTOR),
+  tutorSubjectController.deleteTutorSubject,
+);
+
 export const tutorSubjectRouter = router;

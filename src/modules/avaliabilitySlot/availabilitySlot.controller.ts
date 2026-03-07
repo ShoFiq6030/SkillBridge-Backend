@@ -31,12 +31,7 @@ const createAvailabilitySlot = async (
     }
     res.status(201).json(result);
   } catch (e) {
-    console.log((e as Error).message);
-    res.status(500).json({
-      success: false,
-      error: (e as Error).message || "Failed to create availability slot",
-    });
-   
+    next(e);
   }
 };
 

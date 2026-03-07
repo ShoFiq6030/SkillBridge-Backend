@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import express, { Application, Request, Response, NextFunction } from "express";
 
 import cors from "cors";
 import { auth } from "./lib/auth";
@@ -8,6 +8,8 @@ import { availabilitySlotRouter } from "./modules/avaliabilitySlot/availabilityS
 import { bookingRouter } from "./modules/booking/booking.routers";
 import { categoriesRouter } from "./modules/category/category.router";
 import { tutorSubjectRouter } from "./modules/tutorSubject/tutorSubject.router";
+import { notFound } from "./middlewares/notfound";
+import errorHandler from "./middlewares/globalErrorHandler";
 
 const app: Application = express();
 
@@ -27,9 +29,15 @@ app.get("/", (req, res) => {
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use("/api/tutor-profile", tutorProfileRouter);
-app.use ("/api/booking", bookingRouter);
+app.use("/api/booking", bookingRouter);
 app.use("/api/categories", categoriesRouter);
-app.use ("/api/tutor-subject", tutorSubjectRouter);
+app.use("/api/tutor-subject", tutorSubjectRouter);
 app.use("/api/availability-slot", availabilitySlotRouter);
+
+// 404 handler for unmatched routes
+app.use(notFound);
+
+// Global error handler
+app.use(errorHandler);
 
 export default app;

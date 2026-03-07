@@ -164,6 +164,18 @@ const getTutorProfile = async (id: string) => {
         },
       },
       slots: true,
+      bookings: {
+        include: {
+          student: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+        },
+      },
       reviews: {
         select: {
           id: true,
@@ -188,7 +200,6 @@ const updateTutorProfile = async (
       userId: userId,
     },
   });
-
 
   if (!existingProfile || existingProfile.userId !== userId) {
     return null;
