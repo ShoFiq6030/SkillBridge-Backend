@@ -21,7 +21,7 @@ const createTutorSubject = async (categoryId: string, userId: string) => {
         categoryId: categoryId,
       },
     });
-    return tutorSubject
+    return tutorSubject;
   } catch (error) {
     console.error("Error creating tutor subject:", error);
     return {
@@ -31,6 +31,25 @@ const createTutorSubject = async (categoryId: string, userId: string) => {
   }
 };
 
+const getTutorSubject = async (tutorProfileId: string) => {
+  try {
+    const tutorSubject = await prisma.tutorSubject.findMany({
+      where: {
+        tutorProfileId,
+      },
+      include: {
+        category: true,
+        tutorProfile: true,
+      },
+    });
+    return tutorSubject;
+  } catch (error) {
+    console.error("Error fetching tutor subject:", error);
+    return null;
+  }
+};
+
 export const tutorSubjectService = {
   createTutorSubject,
+  getTutorSubject,
 };

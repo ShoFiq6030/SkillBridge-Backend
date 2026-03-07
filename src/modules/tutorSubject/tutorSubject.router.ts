@@ -10,4 +10,6 @@ router.post(
   tutorSubjectController.createTutorSubject,
 );
 
+router.get("/:tutorProfileId", tutorSubjectController.getTutorSubject);
+
 export const tutorSubjectRouter = router;

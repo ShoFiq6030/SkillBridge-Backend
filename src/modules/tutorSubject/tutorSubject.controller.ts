@@ -32,6 +32,31 @@ const createTutorSubject = async (req: Request, res: Response) => {
   }
 };
 
+const getTutorSubject = async (req: Request, res: Response) => {
+  try {
+    const { tutorProfileId } = req.params;
+    const result = await tutorSubjectService.getTutorSubject(tutorProfileId as string);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "Tutor subject not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Tutor subject retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.error("Error fetching tutor subject:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 export const tutorSubjectController = {
   createTutorSubject,
+  getTutorSubject,
 };
