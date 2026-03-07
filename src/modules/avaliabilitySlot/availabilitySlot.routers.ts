@@ -10,4 +10,10 @@ router.post(
   availabilitySlotController.createAvailabilitySlot,
 );
 
+router.put(
+  "/:slotId",
+  auth(UserRole.TUTOR),
+  availabilitySlotController.updateAvailabilitySlot,
+);
+
 export const availabilitySlotRouter = router;
