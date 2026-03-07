@@ -161,7 +161,52 @@ const updateAvailabilitySlot = async (
   };
 };
 
+const deleteAvailabilitySlot = async (slotId: string, userId: string) => {
+  // Get the slot to check ownership
+  const slot = await prisma.availabilitySlot.findUnique({
+    where: { id: slotId },
+    include: {
+      tutorProfile: {
+        select: { userId: true },
+      },
+    },
+  });
+
+  if (!slot) {
+    return {
+      success: false,
+      error: "Availability slot not found",
+    };
+  }
+
+  // Check if the tutor is deleting their own slot
+  if (slot.tutorProfile.userId !== userId) {
+    return {
+      success: false,
+      error: "You can only delete your own availability slots",
+    };
+  }
+
+  // Check if slot is already booked - can't delete if booked
+  if (slot.isBooked) {
+    return {
+      success: false,
+      error: "Cannot delete a booked availability slot",
+    };
+  }
+
+  await prisma.availabilitySlot.delete({
+    where: { id: slotId },
+  });
+
+  return {
+    success: true,
+    message: "Availability slot deleted successfully",
+  };
+};
+
 export const availabilitySlotService = {
   createAvailabilitySlot,
   updateAvailabilitySlot,
+  deleteAvailabilitySlot,
 };
