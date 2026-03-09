@@ -72,7 +72,81 @@ const getBookingsByStudentIdService = async (studentId: string) => {
   }
 };
 
+const updateBookingStatusService = async (
+  bookingId: string,
+  status: string,
+  tutorId: string,
+) => {
+  try {
+    // Validate status
+    if (!["COMPLETED", "CANCELLED"].includes(status)) {
+      return {
+        success: false,
+        error: "Status can only be COMPLETED or CANCELLED",
+      };
+    }
+
+    // Find booking
+    const booking = await prisma.booking.findUnique({
+      where: {
+        id: bookingId,
+      },
+      include: {
+        tutorProfile: true,
+      },
+    });
+
+    if (!booking) {
+      return {
+        success: false,
+        error: "Booking not found",
+      };
+    }
+
+    // Verify tutor is the one who owns this booking
+    const tutorProfile = await prisma.tutorProfile.findUnique({
+      where: {
+        userId: tutorId,
+      },
+    });
+
+    if (!tutorProfile || booking.tutorProfileId !== tutorProfile.id) {
+      return {
+        success: false,
+        error: "Only the tutor of this booking can update its status",
+      };
+    }
+
+    // Update booking status
+    const updatedBooking = await prisma.booking.update({
+      where: {
+        id: bookingId,
+      },
+      data: {
+        status,
+      },
+      include: {
+        tutorProfile: true,
+        slot: true,
+        tutorSubject: true,
+      },
+    });
+
+    return {
+      success: true,
+      data: updatedBooking,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: (error as Error).message || "Failed to update booking status",
+    };
+  }
+};
+
 export const bookingService = {
   createBookingService,
   getBookingsByStudentIdService,
+  updateBookingStatusService,
 };

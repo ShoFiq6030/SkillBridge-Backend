@@ -6,5 +6,10 @@ const router = express.Router();
 
 router.post("/", auth(UserRole.USER), bookingController.createBooking);
 router.get("/", auth(UserRole.USER), bookingController.getBookingsByStudentId);
+router.patch(
+  "/:bookingId/status",
+  auth(UserRole.TUTOR),
+  bookingController.updateBookingStatus,
+);
 
 export const bookingRouter = router;

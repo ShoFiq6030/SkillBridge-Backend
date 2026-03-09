@@ -50,7 +50,45 @@ const getAllCategories = async (
   }
 };
 
+const updateCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(400).json({
+        error: "Unauthorized!",
+      });
+    }
+    if (user.role !== "ADMIN") {
+      return res.status(400).json({
+        error: "Only admins  can update categories!",
+      });
+    }
+    const { id } = req.params;
+    const result = await categoriesService.updateCategory(
+      id as string,
+      req.body,
+    );
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        error: result.error || "Failed to update category",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: result.data,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 export const categoriesController = {
   createCategory,
   getAllCategories,
+  updateCategory,
 };

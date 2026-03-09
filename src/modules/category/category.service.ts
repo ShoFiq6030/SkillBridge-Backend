@@ -48,7 +48,62 @@ const getAllCategories = async () => {
   }
 };
 
+const updateCategory = async (id: string, categoryData: Partial<Category>) => {
+  try {
+    const { name, slug } = categoryData;
+
+    // Check if category exists
+    const existingCategory = await prisma.category.findUnique({
+      where: { id },
+    });
+    if (!existingCategory) {
+      return {
+        success: false,
+        error: "Category not found",
+      };
+    }
+
+    // Check for uniqueness if name or slug is being updated
+    if (name || slug) {
+      const duplicateCheck = await prisma.category.findFirst({
+        where: {
+          OR: [
+            name ? { name, id: { not: id } } : {},
+            slug ? { slug, id: { not: id } } : {},
+          ].filter(condition => Object.keys(condition).length > 0),
+        },
+      });
+      if (duplicateCheck) {
+        return {
+          success: false,
+          error: "Category with this name or slug already exists",
+        };
+      }
+    }
+
+    const updatedCategory = await prisma.category.update({
+      where: { id },
+      data: {
+        ...(name && { name }),
+        ...(slug && { slug }),
+      },
+    });
+
+    return {
+      success: true,
+      data: updatedCategory,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: (error as Error).message || "Failed to update category",
+    };
+  }
+};
+
 export const categoriesService = {
   createCategory,
   getAllCategories,
+  updateCategory,
 };
