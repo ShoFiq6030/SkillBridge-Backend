@@ -119,8 +119,38 @@ const deleteAvailabilitySlot = async (
   }
 };
 
+const getAvailableSlotsForTutor = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { tutorId } = req.params;
+    if (!tutorId) {
+      return res.status(400).json({
+        success: false,
+        error: "Tutor ID is required",
+      });
+    }
+
+    const result = await availabilitySlotService.getAvailableSlotsForTutor(
+      tutorId as string,
+    );
+    if (!result.success) {
+      return res.status(404).json({
+        success: false,
+        error: result.error,
+      });
+    }
+    res.status(200).json(result);
+  } catch (e) {
+    next(e);
+  }
+};
+
 export const availabilitySlotController = {
   createAvailabilitySlot,
   updateAvailabilitySlot,
   deleteAvailabilitySlot,
+  getAvailableSlotsForTutor,
 };

@@ -205,8 +205,45 @@ const deleteAvailabilitySlot = async (slotId: string, userId: string) => {
   };
 };
 
+const getAvailableSlotsForTutor = async (tutorId: string) => {
+  // Find the tutor profile
+  const tutorProfile = await prisma.tutorProfile.findUnique({
+    where: { id: tutorId },
+  });
+
+  if (!tutorProfile) {
+    return {
+      success: false,
+      error: "Tutor not found",
+    };
+  }
+
+  // Get all available slots for this tutor that are not booked and in the future
+  const slots = await prisma.availabilitySlot.findMany({
+    where: {
+      tutorProfileId: tutorProfile.id,
+      isBooked: false,
+      startAt: {
+        gte: new Date(),
+      },
+    },
+    include: {
+      tutorProfile: true,
+    },
+    orderBy: {
+      startAt: "asc",
+    },
+  });
+
+  return {
+    success: true,
+    data: slots,
+  };
+};
+
 export const availabilitySlotService = {
   createAvailabilitySlot,
   updateAvailabilitySlot,
   deleteAvailabilitySlot,
+  getAvailableSlotsForTutor,
 };

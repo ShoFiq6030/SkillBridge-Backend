@@ -22,4 +22,9 @@ router.delete(
   availabilitySlotController.deleteAvailabilitySlot,
 );
 
+router.get(
+  "/tutor/:tutorId",
+  availabilitySlotController.getAvailableSlotsForTutor,
+);
+
 export const availabilitySlotRouter = router;
