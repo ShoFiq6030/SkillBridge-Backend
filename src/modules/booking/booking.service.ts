@@ -1,4 +1,4 @@
-import { Booking } from "../../../generated/prisma";
+import { Booking, BookingStatus } from "../../../generated/prisma";
 import { prisma } from "../../lib/prisma";
 
 const createBookingService = async (bookingData: Booking, userId: string) => {
@@ -74,8 +74,8 @@ const getBookingsByStudentIdService = async (studentId: string) => {
 
 const updateBookingStatusService = async (
   bookingId: string,
-  status: string,
-  tutorId: string,
+  status: BookingStatus,
+  userId: string,
 ) => {
   try {
     // Validate status
@@ -85,6 +85,12 @@ const updateBookingStatusService = async (
         error: "Status can only be COMPLETED or CANCELLED",
       };
     }
+
+    const tutorProfile = await prisma.tutorProfile.findUnique({
+      where: {
+        userId,
+      },
+    });
 
     // Find booking
     const booking = await prisma.booking.findUnique({
@@ -102,13 +108,6 @@ const updateBookingStatusService = async (
         error: "Booking not found",
       };
     }
-
-    // Verify tutor is the one who owns this booking
-    const tutorProfile = await prisma.tutorProfile.findUnique({
-      where: {
-        userId: tutorId,
-      },
-    });
 
     if (!tutorProfile || booking.tutorProfileId !== tutorProfile.id) {
       return {
