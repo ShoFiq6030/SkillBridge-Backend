@@ -163,7 +163,13 @@ const getTutorProfile = async (id: string) => {
           category: true,
         },
       },
-      slots: true,
+      slots: {
+        where: {
+          startAt: {
+            gte: new Date(),
+          },
+        },
+      },
       bookings: {
         include: {
           student: {
