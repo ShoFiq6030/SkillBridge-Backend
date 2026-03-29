@@ -31,6 +31,16 @@ const createBookingService = async (bookingData: Booking, userId: string) => {
         error: "Failed to create booking",
       };
     }
+    // update the slot to mark it as booked
+    await prisma.availabilitySlot.update({
+      where: {
+        id: slotId,
+      },
+      data: {
+        isBooked: true,
+      },
+    });
+
     return {
       success: true,
       data: booking,

@@ -101,6 +101,35 @@ const getTutorProfile = async (
     next(e);
   }
 };
+const getTutorProfileWithTutorId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const profileId = typeof id === "string" ? id : undefined;
+    if (!profileId) {
+      return res.status(400).json({
+        error: "Tutor profile ID is required",
+      });
+    }
+
+    const result = await tutorProfileService.getTutorProfileWithTutorId(profileId);
+    if (!result) {
+      return res.status(404).json({
+        error: "Tutor profile not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      tutorProfile: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
 
 const updateTutorProfile = async (
   req: Request,
@@ -158,4 +187,5 @@ export const tutorProfileController = {
   listTutors,
   getTutorProfile,
   updateTutorProfile,
+  getTutorProfileWithTutorId
 };

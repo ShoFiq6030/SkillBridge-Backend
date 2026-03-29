@@ -11,6 +11,7 @@ router.post(
 );
 router.get("/list", tutorProfileController.listTutors);
 router.get("/:id", tutorProfileController.getTutorProfile);
+router.get("/tutor/:id", tutorProfileController.getTutorProfileWithTutorId);
 router.put(
   "/:id",
   auth(UserRole.TUTOR),

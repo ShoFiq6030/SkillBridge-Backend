@@ -44,7 +44,7 @@ const listTutors = async (filters: ListTutorsFilters) => {
     },
   };
 
-  // Text search in headline or bio
+  // Text search in headline , bio and name
   if (search) {
     where.OR = [
       {
@@ -59,10 +59,17 @@ const listTutors = async (filters: ListTutorsFilters) => {
           mode: "insensitive",
         },
       },
+      {
+        user: {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      },
     ];
   }
 
-  // Price range filter – build a separate object so we don't spread undefined
   const rateFilter: any = {};
   if (minHourlyRate !== undefined && !isNaN(minHourlyRate)) {
     rateFilter.gte = minHourlyRate;
@@ -144,7 +151,7 @@ const listTutors = async (filters: ListTutorsFilters) => {
 const getTutorProfile = async (id: string) => {
   const result = await prisma.tutorProfile.findUnique({
     where: {
-      id,
+      userId: id,
       user: {
         status: "ACTIVE",
       },
@@ -168,20 +175,52 @@ const getTutorProfile = async (id: string) => {
           startAt: {
             gte: new Date(),
           },
+          isBooked: false,
         },
       },
-      bookings: {
+
+      reviews: {
+        select: {
+          id: true,
+          rating: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+const getTutorProfileWithTutorId = async (id: string) => {
+  const result = await prisma.tutorProfile.findUnique({
+    where: {
+      id: id,
+      user: {
+        status: "ACTIVE",
+      },
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          image: true,
+        },
+      },
+      subjects: {
         include: {
-          student: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-            },
-          },
+          category: true,
         },
       },
+      slots: {
+        where: {
+          startAt: {
+            gte: new Date(),
+          },
+          isBooked: false,
+        },
+      },
+
       reviews: {
         select: {
           id: true,
@@ -248,4 +287,5 @@ export const tutorProfileService = {
   listTutors,
   getTutorProfile,
   updateTutorProfile,
+  getTutorProfileWithTutorId
 };

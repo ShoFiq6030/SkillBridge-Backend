@@ -9385,7 +9385,13 @@ var getTutorProfile = async (id) => {
           category: true
         }
       },
-      slots: true,
+      slots: {
+        where: {
+          startAt: {
+            gte: /* @__PURE__ */ new Date()
+          }
+        }
+      },
       bookings: {
         include: {
           student: {
