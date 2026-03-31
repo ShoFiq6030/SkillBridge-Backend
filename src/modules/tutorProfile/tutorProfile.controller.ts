@@ -101,6 +101,46 @@ const getTutorProfile = async (
     next(e);
   }
 };
+const getTutorProfileAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const profileId = typeof id === "string" ? id : undefined;
+    if (!profileId) {
+      return res.status(400).json({
+        error: "Tutor profile ID is required",
+      });
+    }
+    if (!req.user) {
+      return res.status(401).json({
+        error: "Unauthorized!",
+      });
+    }
+    
+
+    const result = await tutorProfileService.getTutorProfileAuth(profileId);
+    if (!result) {
+      return res.status(404).json({
+        error: "Tutor profile not found",
+      });
+    }
+    if(req.user.id !== result.userId && req.user.role !== "ADMIN"){
+      return res.status(403).json({
+        error: "Forbidden! You don't have access to this tutor profile.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      tutorProfile: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
 const getTutorProfileWithTutorId = async (
   req: Request,
   res: Response,
@@ -187,5 +227,6 @@ export const tutorProfileController = {
   listTutors,
   getTutorProfile,
   updateTutorProfile,
-  getTutorProfileWithTutorId
+  getTutorProfileWithTutorId,
+  getTutorProfileAuth
 };

@@ -12,6 +12,11 @@ router.post(
 router.get("/list", tutorProfileController.listTutors);
 router.get("/:id", tutorProfileController.getTutorProfile);
 router.get("/tutor/:id", tutorProfileController.getTutorProfileWithTutorId);
+router.get(
+  "/tutor/auth/:id",
+  auth(UserRole.TUTOR, UserRole.ADMIN),
+  tutorProfileController.getTutorProfileAuth,
+);
 router.put(
   "/:id",
   auth(UserRole.TUTOR),

@@ -9285,6 +9285,14 @@ var listTutors = async (filters) => {
           contains: search,
           mode: "insensitive"
         }
+      },
+      {
+        user: {
+          name: {
+            contains: search,
+            mode: "insensitive"
+          }
+        }
       }
     ];
   }
@@ -9361,6 +9369,46 @@ var listTutors = async (filters) => {
 var getTutorProfile = async (id) => {
   const result = await prisma.tutorProfile.findUnique({
     where: {
+      userId: id,
+      user: {
+        status: "ACTIVE"
+      }
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          image: true
+        }
+      },
+      subjects: {
+        include: {
+          category: true
+        }
+      },
+      slots: {
+        where: {
+          startAt: {
+            gte: /* @__PURE__ */ new Date()
+          },
+          isBooked: false
+        }
+      },
+      reviews: {
+        select: {
+          id: true,
+          rating: true
+        }
+      }
+    }
+  });
+  return result;
+};
+var getTutorProfileWithTutorId = async (id) => {
+  const result = await prisma.tutorProfile.findUnique({
+    where: {
       id,
       user: {
         status: "ACTIVE"
@@ -9384,19 +9432,8 @@ var getTutorProfile = async (id) => {
         where: {
           startAt: {
             gte: /* @__PURE__ */ new Date()
-          }
-        }
-      },
-      bookings: {
-        include: {
-          student: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true
-            }
-          }
+          },
+          isBooked: false
         }
       },
       reviews: {
@@ -9453,7 +9490,8 @@ var tutorProfileService = {
   createTutorProfile,
   listTutors,
   getTutorProfile,
-  updateTutorProfile
+  updateTutorProfile,
+  getTutorProfileWithTutorId
 };
 
 // src/helpers/paginationSortingHelper.ts
@@ -9551,6 +9589,29 @@ var getTutorProfile2 = async (req, res, next) => {
     next(e);
   }
 };
+var getTutorProfileWithTutorId2 = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const profileId = typeof id === "string" ? id : void 0;
+    if (!profileId) {
+      return res.status(400).json({
+        error: "Tutor profile ID is required"
+      });
+    }
+    const result = await tutorProfileService.getTutorProfileWithTutorId(profileId);
+    if (!result) {
+      return res.status(404).json({
+        error: "Tutor profile not found"
+      });
+    }
+    res.status(200).json({
+      success: true,
+      tutorProfile: result
+    });
+  } catch (e) {
+    next(e);
+  }
+};
 var updateTutorProfile2 = async (req, res, next) => {
   try {
     const user = req.user;
@@ -9595,7 +9656,8 @@ var tutorProfileController = {
   createTutorProfile: createTutorProfile2,
   listTutors: listTutors2,
   getTutorProfile: getTutorProfile2,
-  updateTutorProfile: updateTutorProfile2
+  updateTutorProfile: updateTutorProfile2,
+  getTutorProfileWithTutorId: getTutorProfileWithTutorId2
 };
 
 // src/modules/tutorProfile/tutorProfile.router.ts
@@ -9607,6 +9669,7 @@ router.post(
 );
 router.get("/list", tutorProfileController.listTutors);
 router.get("/:id", tutorProfileController.getTutorProfile);
+router.get("/tutor/:id", tutorProfileController.getTutorProfileWithTutorId);
 router.put(
   "/:id",
   auth_default("TUTOR" /* TUTOR */),
@@ -10000,6 +10063,14 @@ var createBookingService = async (bookingData, userId) => {
         error: "Failed to create booking"
       };
     }
+    await prisma.availabilitySlot.update({
+      where: {
+        id: slotId
+      },
+      data: {
+        isBooked: true
+      }
+    });
     return {
       success: true,
       data: booking
