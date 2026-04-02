@@ -16,6 +16,8 @@ model Booking {
   status BookingStatus @default(CONFIRMED)
   note   String?
 
+  review Review? @relation()
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

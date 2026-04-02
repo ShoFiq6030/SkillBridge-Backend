@@ -28,6 +28,10 @@ const createAvailabilitySlot = async (
   payload.startAt = new Date(payload.startAt);
   payload.endAt = new Date(payload.endAt);
 
+  const durationInMinutes =
+    (payload.endAt.getTime() - payload.startAt.getTime()) / (1000 * 60); // duration in minutes
+  const durationInHours = Math.floor(durationInMinutes / 60); // duration in hours
+
   for (const slot of existingSlots) {
     if (payload.startAt < slot.endAt && payload.endAt > slot.startAt) {
       return {
@@ -59,8 +63,10 @@ const createAvailabilitySlot = async (
 
   const result = await prisma.availabilitySlot.create({
     data: {
-      ...payload,
+      startAt: payload.startAt,
+      endAt: payload.endAt,
       tutorProfileId: tutorProfile.id,
+      duration: durationInHours,
     },
   });
   return {
@@ -110,6 +116,8 @@ const updateAvailabilitySlot = async (
   // If updating times, validate them
   const startAt = payload.startAt ? new Date(payload.startAt) : slot.startAt;
   const endAt = payload.endAt ? new Date(payload.endAt) : slot.endAt;
+  const durationInMinutes = (endAt.getTime() - startAt.getTime()) / (1000 * 60); // duration in minutes
+  const durationInHours = Math.floor(durationInMinutes / 60); // duration in hours
 
   // Check if the start time is before the end time
   if (startAt >= endAt) {
@@ -151,6 +159,7 @@ const updateAvailabilitySlot = async (
     data: {
       startAt,
       endAt,
+      duration: durationInHours,
     },
   });
 

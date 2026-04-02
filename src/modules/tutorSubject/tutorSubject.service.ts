@@ -94,10 +94,26 @@ const deleteTutorSubject = async (id: string, userId: string) => {
     return { success: false, message: "Internal server error" };
   }
 };
+const hasActiveBookings = async (tutorSubjectId: string) => {
+  try {
+    const activeBookings = await prisma.booking.findFirst({ 
+      where: { 
+        tutorSubjectId: tutorSubjectId,
+        status: "CONFIRMED", 
+      }
+    });
+    return !!activeBookings;
+  } catch (error) {
+    console.error("Error checking active bookings:", error);
+    return false;
+  }
+};
+
 
 export const tutorSubjectService = {
   createTutorSubject,
   getTutorSubject,
   getTutorSubjectById,
   deleteTutorSubject,
+  hasActiveBookings,
 };

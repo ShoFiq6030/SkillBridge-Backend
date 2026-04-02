@@ -214,7 +214,18 @@ const getTutorProfileAuth = async (id: string) => {
       },
       slots: true,
       reviews: true,
-      bookings: true,
+      bookings: {
+        include: {
+          student: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      },
     },
   });
 

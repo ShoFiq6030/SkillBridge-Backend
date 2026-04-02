@@ -87,6 +87,15 @@ const deleteTutorSubject = async (req: Request, res: Response, next: NextFunctio
         .status(status)
         .json({ success: false, message: result.message });
     }
+
+    // check if this subject have any active booking before delete it
+    const hasActiveBookings = await tutorSubjectService.hasActiveBookings(id as string);
+    if (hasActiveBookings) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete tutor subject with active bookings",
+      });
+    }
     res
       .status(200)
       .json({ success: true, message: "Tutor subject deleted successfully" });

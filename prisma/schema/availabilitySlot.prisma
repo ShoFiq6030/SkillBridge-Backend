@@ -5,7 +5,9 @@ model AvailabilitySlot {
   tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
 
   startAt DateTime // Store in UTC
-  endAt   DateTime // Store in UTC
+  endAt DateTime   // Store in UTC  
+  duration   Int @default(1) // Duration in hours
+
 
   isBooked Boolean @default(false)
 
@@ -14,7 +16,7 @@ model AvailabilitySlot {
   studentBookings Booking[]
 
   // Prevent exact duplicate slots
-  @@unique([tutorProfileId, startAt, endAt])
+  @@unique([tutorProfileId, startAt, duration])
   // Improve query performance
   @@index([tutorProfileId])
   @@index([startAt])
