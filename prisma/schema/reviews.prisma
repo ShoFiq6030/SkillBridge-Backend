@@ -10,7 +10,7 @@ model Review {
   bookingId String
   booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
-  status  ReviewStatus @default(PENDING)
+  status  ReviewStatus @default(APPROVED)
   //rating between  1 to 5 
   rating  Int          @default(0)
   comment String?

@@ -213,7 +213,21 @@ const getTutorProfileAuth = async (id: string) => {
         },
       },
       slots: true,
-      reviews: true,
+      reviews: {
+        select: {
+          id: true,
+          rating: true,
+          note: true,
+          student: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+        },
+      },
       bookings: {
         include: {
           student: {
@@ -232,6 +246,7 @@ const getTutorProfileAuth = async (id: string) => {
   return result;
 };
 const getTutorProfileWithTutorId = async (id: string) => {
+  // console.log(id)
   const result = await prisma.tutorProfile.findUnique({
     where: {
       id: id,
@@ -253,19 +268,23 @@ const getTutorProfileWithTutorId = async (id: string) => {
           category: true,
         },
       },
-      slots: {
-        where: {
-          startAt: {
-            gte: new Date(),
-          },
-          isBooked: false,
-        },
-      },
-
+      slots: true,
       reviews: {
         select: {
           id: true,
           rating: true,
+          comment: true,
+          bookingId: true,
+          createdAt: true,
+          updatedAt: true,
+          student: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
         },
       },
     },
@@ -350,7 +369,6 @@ const getStatistics = async (userId: string) => {
       status: "COMPLETED",
     },
   });
-
 
   const averageRating = await prisma.review.aggregate({
     where: {
