@@ -217,7 +217,10 @@ const getTutorProfileAuth = async (id: string) => {
         select: {
           id: true,
           rating: true,
-          note: true,
+          comment: true,
+          bookingId: true,
+          createdAt: true,
+          updatedAt: true,
           student: {
             select: {
               id: true,
