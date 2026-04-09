@@ -119,7 +119,6 @@ const getTutorProfileAuth = async (
         error: "Unauthorized!",
       });
     }
-    
 
     const result = await tutorProfileService.getTutorProfileAuth(profileId);
     if (!result) {
@@ -127,7 +126,7 @@ const getTutorProfileAuth = async (
         error: "Tutor profile not found",
       });
     }
-    if(req.user.id !== result.userId && req.user.role !== "ADMIN"){
+    if (req.user.id !== result.userId && req.user.role !== "ADMIN") {
       return res.status(403).json({
         error: "Forbidden! You don't have access to this tutor profile.",
       });
@@ -155,7 +154,8 @@ const getTutorProfileWithTutorId = async (
       });
     }
 
-    const result = await tutorProfileService.getTutorProfileWithTutorId(profileId);
+    const result =
+      await tutorProfileService.getTutorProfileWithTutorId(profileId);
     if (!result) {
       return res.status(404).json({
         error: "Tutor profile not found",
@@ -196,7 +196,6 @@ const updateTutorProfile = async (
         error: "Tutor profile ID is required",
       });
     }
-  
 
     const result = await tutorProfileService.updateTutorProfile(
       profileId,
@@ -222,11 +221,39 @@ const updateTutorProfile = async (
   }
 };
 
+const getStatistics = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({
+        error: "Unauthorized!",
+      });
+    }
+    if (user.role !== "TUTOR") {
+      return res.status(403).json({
+        error: "Only tutors can access their statistics!",
+      });
+    }
+    const result = await tutorProfileService.getStatistics(user.id as string);
+    res.status(200).json({
+      success: true,
+      statistics: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 export const tutorProfileController = {
   createTutorProfile,
   listTutors,
   getTutorProfile,
   updateTutorProfile,
   getTutorProfileWithTutorId,
-  getTutorProfileAuth
+  getTutorProfileAuth,
+  getStatistics
 };

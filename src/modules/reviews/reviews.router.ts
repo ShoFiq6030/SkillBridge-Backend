@@ -28,6 +28,11 @@ router.patch(
   auth(UserRole.ADMIN, UserRole.TUTOR),
   reviewsController.updateReviewStatus
 );
+router.patch(
+  "/:id",
+  auth(UserRole.USER, ),
+  reviewsController.updateReview
+);
 
 // Delete review (authenticated users, service validates ownership)
 router.delete(

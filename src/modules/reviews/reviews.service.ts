@@ -64,7 +64,7 @@ const createReview = async (
       bookingId: dto.bookingId,
       rating: dto.rating,
       comment: dto.comment ?? null,
-      status: "PENDING",
+      status: "APPROVED",
     },
     include: {
       student: {
@@ -128,6 +128,39 @@ const updateTutorProfileRating = async (tutorProfileId: string) => {
       totalReviews,
     },
   });
+};
+const updateReviewService = async (
+  reviewId: string,
+  dto: Partial<CreateReviewDto>,
+  studentId: string
+): Promise<Review> => {
+  // Check if review exists
+  const review = await prisma.review.findUnique({
+    where: { id: reviewId },
+  });
+
+  if (!review) {
+    throw new Error("Review not found");
+  }
+
+  // Verify the student is the one who created the review
+  if (review.studentId !== studentId) {
+    throw new Error("You can only update your own reviews");
+  }
+
+  // Update the review
+  const updatedReview = await prisma.review.update({
+    where: { id: reviewId },
+    data: {
+      rating: dto.rating ?? review.rating,
+      comment: dto.comment ?? review.comment,
+    },
+  });
+
+  // Update tutor profile's average rating and total reviews
+  await updateTutorProfileRating(review.tutorProfileId);
+
+  return updatedReview;
 };
 
 const getReviewById = async (id: string) => {
@@ -396,4 +429,5 @@ export const reviewsService = {
   getReviewsByStudent,
   updateReviewStatus,
   deleteReview,
+  updateReviewService
 };

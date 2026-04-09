@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { reviewsService } from "./reviews.service";
 
-const createReview = async (req: Request, res: Response, next: NextFunction) => {
+const createReview = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const user = req.user;
     if (!user) {
@@ -30,12 +34,49 @@ const createReview = async (req: Request, res: Response, next: NextFunction) => 
         rating,
         comment,
       },
-      user.id as string
+      user.id as string,
     );
 
     res.status(201).json({
       success: true,
-      message: "Review submitted successfully. It will be published after approval.",
+      message:
+        "Review submitted successfully. It will be published after approval.",
+      review: result,
+    });
+  } catch (e: any) {
+    next(e);
+  }
+};
+const updateReview = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({
+        error: "Unauthorized!",
+      });
+    }
+
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({
+        error: "Review ID is required",
+      });
+    }
+
+    const { rating, comment } = req.body;
+
+    const result = await reviewsService.updateReviewService(
+      id as string,
+      { rating, comment },
+      user.id as string,
+    );
+
+    res.status(200).json({
+      success: true,
       review: result,
     });
   } catch (e: any) {
@@ -43,7 +84,11 @@ const createReview = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-const getReviewById = async (req: Request, res: Response, next: NextFunction) => {
+const getReviewById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
     const reviewId = Array.isArray(id) ? id[0] : (id as string);
@@ -68,7 +113,7 @@ const getReviewById = async (req: Request, res: Response, next: NextFunction) =>
 const getReviewsByTutorProfile = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { tutorProfileId } = req.params;
@@ -84,7 +129,7 @@ const getReviewsByTutorProfile = async (
     const result = await reviewsService.getReviewsByTutorProfile(
       tutorProfileId as string,
       page,
-      limit
+      limit,
     );
 
     res.status(200).json({
@@ -96,7 +141,11 @@ const getReviewsByTutorProfile = async (
   }
 };
 
-const getMyReviews = async (req: Request, res: Response, next: NextFunction) => {
+const getMyReviews = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const user = req.user;
     if (!user) {
@@ -111,7 +160,7 @@ const getMyReviews = async (req: Request, res: Response, next: NextFunction) => 
     const result = await reviewsService.getReviewsByStudent(
       user.id as string,
       page,
-      limit
+      limit,
     );
 
     res.status(200).json({
@@ -126,7 +175,7 @@ const getMyReviews = async (req: Request, res: Response, next: NextFunction) => 
 const updateReviewStatus = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const user = req.user;
@@ -157,7 +206,7 @@ const updateReviewStatus = async (
       reviewId,
       status,
       user.id as string,
-      user.role as string
+      user.role as string,
     );
 
     res.status(200).json({
@@ -170,7 +219,11 @@ const updateReviewStatus = async (
   }
 };
 
-const deleteReview = async (req: Request, res: Response, next: NextFunction) => {
+const deleteReview = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const user = req.user;
     if (!user) {
@@ -191,7 +244,7 @@ const deleteReview = async (req: Request, res: Response, next: NextFunction) => 
     const result = await reviewsService.deleteReview(
       reviewId,
       user.id as string,
-      user.role as string
+      user.role as string,
     );
 
     res.status(200).json({
@@ -210,4 +263,5 @@ export const reviewsController = {
   getMyReviews,
   updateReviewStatus,
   deleteReview,
+  updateReview,
 };

@@ -15,6 +15,17 @@ const createBookingService = async (bookingData: Booking, userId: string) => {
         error: "Invalid slot ID",
       };
     }
+    const slotDuration = slotDetails.duration;
+    const tutorHourlyRate = await prisma.tutorProfile.findUnique({
+      where: {
+        id: slotDetails.tutorProfileId,
+      },
+      select: {
+        hourlyRate: true,
+      },
+    });
+
+    const totalPrice = (tutorHourlyRate?.hourlyRate || 0) * slotDuration;
 
     const booking = await prisma.booking.create({
       data: {
@@ -23,6 +34,7 @@ const createBookingService = async (bookingData: Booking, userId: string) => {
         slotId,
         tutorSubjectId,
         note,
+        price: totalPrice,
       },
     });
     if (!booking) {
@@ -61,9 +73,31 @@ const getBookingsByStudentIdService = async (studentId: string) => {
         studentId,
       },
       include: {
-        tutorProfile: true,
+        tutorProfile: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
         slot: true,
-        tutorSubject: true,
+        tutorSubject: {
+          select: {
+            categoryId: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
+          },
+        },
+        review: true,
       },
       orderBy: {
         createdAt: "desc",

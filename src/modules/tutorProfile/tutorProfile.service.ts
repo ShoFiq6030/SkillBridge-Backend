@@ -323,6 +323,68 @@ const updateTutorProfile = async (
   return result;
 };
 
+const getStatistics = async (userId: string) => {
+  // console.log(userId);
+  const tutorId = await prisma.tutorProfile.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  if (!tutorId) {
+    throw new Error("Tutor profile not found");
+  }
+  // console.log(tutorId)
+
+  const totalBookings = await prisma.booking.count({
+    where: {
+      tutorProfileId: tutorId?.id,
+    },
+  });
+  // console.log("totalBookings", totalBookings);
+  const completedBookings = await prisma.booking.count({
+    where: {
+      tutorProfileId: tutorId?.id,
+      status: "COMPLETED",
+    },
+  });
+
+
+  const averageRating = await prisma.review.aggregate({
+    where: {
+      tutorProfileId: tutorId?.id,
+    },
+    _avg: {
+      rating: true,
+    },
+  });
+
+  const totalEarningsResult = await prisma.booking.aggregate({
+    where: {
+      tutorProfileId: tutorId?.id,
+      status: "COMPLETED",
+    },
+    _sum: {
+      price: true,
+    },
+  });
+  // console.log(
+  //   totalBookings,
+  //   completedBookings,
+  //   averageRating,
+  //   totalEarningsResult,
+  // );
+
+  return {
+    totalBookings,
+    completedBookings,
+    averageRating: averageRating._avg.rating || 0,
+    totalEarnings: totalEarningsResult._sum.price || 0,
+  };
+};
+
 export const tutorProfileService = {
   createTutorProfile,
   listTutors,
@@ -330,4 +392,5 @@ export const tutorProfileService = {
   updateTutorProfile,
   getTutorProfileWithTutorId,
   getTutorProfileAuth,
+  getStatistics,
 };

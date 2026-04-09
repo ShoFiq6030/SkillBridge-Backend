@@ -9,6 +9,11 @@ router.post(
   auth(UserRole.TUTOR),
   tutorProfileController.createTutorProfile,
 );
+router.get(
+  "/statistics",
+  auth(UserRole.TUTOR),
+  tutorProfileController.getStatistics,
+);
 router.get("/list", tutorProfileController.listTutors);
 router.get("/:id", tutorProfileController.getTutorProfile);
 router.get("/tutor/:id", tutorProfileController.getTutorProfileWithTutorId);
