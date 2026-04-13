@@ -70,7 +70,7 @@ const updateCategory = async (id: string, categoryData: Partial<Category>) => {
           OR: [
             name ? { name, id: { not: id } } : {},
             slug ? { slug, id: { not: id } } : {},
-          ].filter(condition => Object.keys(condition).length > 0),
+          ].filter((condition) => Object.keys(condition).length > 0),
         },
       });
       if (duplicateCheck) {
@@ -102,8 +102,40 @@ const updateCategory = async (id: string, categoryData: Partial<Category>) => {
   }
 };
 
+const deleteCategory = async (id: string) => {
+  try {
+    // Check if category exists
+    const existingCategory = await prisma.category.findUnique({
+      where: { id },
+    });
+    if (!existingCategory) {
+      return {
+        success: false,
+        error: "Category not found",
+      };
+    }
+
+    // Delete the category
+    const deletedCategory = await prisma.category.delete({
+      where: { id },
+    });
+
+    return {
+      success: true,
+      data: deletedCategory,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: (error as Error).message || "Failed to delete category",
+    };
+  }
+};
+
 export const categoriesService = {
   createCategory,
   getAllCategories,
   updateCategory,
+  deleteCategory,
 };

@@ -9,6 +9,7 @@ import { bookingRouter } from "./modules/booking/booking.routers";
 import { categoriesRouter } from "./modules/category/category.router";
 import { tutorSubjectRouter } from "./modules/tutorSubject/tutorSubject.router";
 import { reviewsRouter } from "./modules/reviews/reviews.router";
+import { adminRouter } from "./modules/admin/admin.routes";
 import { notFound } from "./middlewares/notfound";
 import errorHandler from "./middlewares/globalErrorHandler";
 
@@ -35,6 +36,7 @@ app.use("/api/categories", categoriesRouter);
 app.use("/api/tutor-subject", tutorSubjectRouter);
 app.use("/api/availability-slot", availabilitySlotRouter);
 app.use("/api/reviews", reviewsRouter);
+app.use("/api/admin", adminRouter);
 
 // 404 handler for unmatched routes
 app.use(notFound);

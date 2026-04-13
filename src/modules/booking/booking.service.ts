@@ -116,6 +116,144 @@ const getBookingsByStudentIdService = async (studentId: string) => {
   }
 };
 
+const getAllBookingsService = async () => {
+  try {
+    const bookings = await prisma.booking.findMany({
+      include: {
+        tutorProfile: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
+        student: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        slot: true,
+        tutorSubject: {
+          select: {
+            categoryId: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
+          },
+        },
+        review: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return {
+      success: true,
+      data: bookings,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: (error as Error).message || "Failed to fetch bookings",
+    };
+  }
+};
+
+const updateBookingStatusByAdminService = async (
+  bookingId: string,
+  status: BookingStatus,
+) => {
+  try {
+    if (!Object.values(BookingStatus).includes(status)) {
+      return {
+        success: false,
+        error: "Invalid booking status",
+      };
+    }
+
+    const booking = await prisma.booking.findUnique({
+      where: {
+        id: bookingId,
+      },
+    });
+
+    if (!booking) {
+      return {
+        success: false,
+        error: "Booking not found",
+      };
+    }
+
+    const updatedBooking = await prisma.booking.update({
+      where: {
+        id: bookingId,
+      },
+      data: {
+        status,
+      },
+      include: {
+        tutorProfile: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        student: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        slot: true,
+        tutorSubject: {
+          select: {
+            categoryId: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
+          },
+        },
+        review: true,
+      },
+    });
+
+    return {
+      success: true,
+      data: updatedBooking,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: (error as Error).message || "Failed to update booking status",
+    };
+  }
+};
+
 const updateBookingStatusService = async (
   bookingId: string,
   status: BookingStatus,
@@ -191,5 +329,7 @@ const updateBookingStatusService = async (
 export const bookingService = {
   createBookingService,
   getBookingsByStudentIdService,
+  getAllBookingsService,
   updateBookingStatusService,
+  updateBookingStatusByAdminService,
 };
