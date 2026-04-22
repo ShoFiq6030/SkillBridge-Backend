@@ -3,7 +3,7 @@ model User {
   name            String
   email           String
   emailVerified   Boolean       @default(false)
-  image           String?
+  image           String?       @default("https://res.cloudinary.com/dfz4ek2ub/image/upload/v1766300704/PH/PH-10/ladaenosgqi8pdhgyd9l.png")
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   role            String?       @default("USER")

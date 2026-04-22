@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { ListTutorsFilters, tutorProfileService } from "./tutorProfile.service";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 
+
 const createTutorProfile = async (
   req: Request,
   res: Response,
@@ -20,10 +21,11 @@ const createTutorProfile = async (
       });
     }
     const result = await tutorProfileService.createTutorProfile(
+      
       req.body,
       user.id as string,
     );
-    res.status(201).json(result);
+    res.status(201).json({success : true,data:result});
   } catch (e) {
     next(e);
   }

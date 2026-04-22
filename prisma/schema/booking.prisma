@@ -13,9 +13,11 @@ model Booking {
   tutorSubjectId String
   tutorSubject   TutorSubject @relation(fields: [tutorSubjectId], references: [id], onDelete: Cascade)
 
-  status BookingStatus @default(CONFIRMED)
+  status BookingStatus @default(PENDING)
   note   String?
   price     Float @default(0)
+  currency  Currency  @default(USD)
+  payment Payment?
   
 
   review Review? @relation()
@@ -30,6 +32,7 @@ model Booking {
 }
 
 enum BookingStatus {
+  PENDING
   CONFIRMED
   COMPLETED
   CANCELLED

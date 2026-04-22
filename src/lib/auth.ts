@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import nodemailer from "nodemailer";
 import { verifyEmailTemplate } from "./email-template";
+import { oAuthProxy } from "better-auth/plugins";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -18,7 +19,8 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql", // or "mysql", "postgresql", ...etc
   }),
-  trustedOrigins: [process.env.APP_URL!],
+  baseURL: process.env.FRONTEND_URL,
+  trustedOrigins: [process.env.FRONTEND_URL!],
   user: {
     additionalFields: {
       role: {
@@ -35,6 +37,7 @@ export const auth = betterAuth({
   },
 
   databaseHooks: {
+    baseURL: process.env.BETTER_AUTH_URL,
     user: {
       create: {
         before: async (user) => {
@@ -64,7 +67,7 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url, token }, request) => {
       try {
-        const verificationUrl = `${process.env.APP_URL}/verify-email?token=${token}`;
+        const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
         const info = await transporter.sendMail({
           from: '"SkillBridge" <skillbridge@example.com>',
           to: user.email,
@@ -87,6 +90,20 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
+  // account: { skipStateCookieCheck: true }, // solved redirect issue
+  advanced: {
+    cookies: {
+      state: {
+        attributes: {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        },
+      },
+    },
+  },
+
+  plugins: [oAuthProxy()],
 });
 
 //

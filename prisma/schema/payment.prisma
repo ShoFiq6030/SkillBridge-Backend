@@ -1,0 +1,37 @@
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum PaymentProvider {
+  STRIPE
+  SSLCOMMERZ
+  BKASH
+  NAGAD
+}
+
+model Payment {
+  id              String           @id @default(uuid())
+
+  bookingId       String           @unique
+  booking         Booking          @relation(fields: [bookingId],references: [id],onDelete: Cascade)
+
+  amount          Int
+  currency        Currency
+
+  status          PaymentStatus    @default(PENDING)
+  provider        PaymentProvider
+
+  transactionId   String?          // gateway trx id
+  paymentMethod   String?          // card, bkash, etc.
+
+  paidAt          DateTime?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([status])
+  @@index([provider])
+   @@map("payments")
+}
