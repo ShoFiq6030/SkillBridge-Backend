@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { bookingService } from "./booking.service";
+import { paymentController } from "../payment/payment.controller";
+import { paymentService } from "../payment/payment.service";
 
 const createBooking = async (
   req: Request,
@@ -20,7 +22,22 @@ const createBooking = async (
     if (!result.success) {
       return res.status(400).json(result);
     }
-    res.status(201).json(result);
+    if (!result.data) {
+      return res.status(400).json({
+        success: false,
+        message: "Failed to create booking",
+      });
+    }
+    
+
+    res.status(201).json({
+      success: true,
+      data:{
+        ...result.data,
+     
+
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -166,10 +183,36 @@ const updateBookingStatus = async (
   }
 };
 
+const getUserBookedSlotsOfTutor = async (
+  req: Request,
+  res: Response,  
+  next: NextFunction,) => {
+  try {
+    const user = req.user;
+    const tutorId = req.params.tutorId
+    if (!user) {
+      return res.status(400).json({
+        error: "Unauthorized!",
+      });
+    }
+    const result = await bookingService.getUserBookedSlotsOfTutorService(
+      user.id as string,
+      tutorId as string
+    );
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const bookingController = {
   createBooking,
   getBookingsByStudentId,
   getAllBookings,
+  getUserBookedSlotsOfTutor,
   updateBookingStatus,
   updateBookingStatusByAdmin,
 };

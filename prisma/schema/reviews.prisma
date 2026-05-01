@@ -1,27 +1,20 @@
 model Review {
-  id String @id @default(uuid())
-
+  id             String       @id @default(uuid())
   tutorProfileId String
+  studentId      String
+  status         ReviewStatus @default(APPROVED)
+  rating         Int          @default(0)
+  comment        String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  bookingId      String       @unique
+  booking        Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  student        User         @relation("StudentReviews", fields: [studentId], references: [id])
   tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
-
-  studentId String
-  student   User   @relation("StudentReviews", fields: [studentId], references: [id])
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-
-  status  ReviewStatus @default(APPROVED)
-  //rating between  1 to 5 
-  rating  Int          @default(0)
-  comment String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@index([tutorProfileId])
   @@index([studentId])
   @@index([bookingId])
-  @@unique([bookingId])
   @@map("reviews")
 }
 

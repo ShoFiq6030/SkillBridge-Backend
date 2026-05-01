@@ -325,6 +325,51 @@ const updateBookingStatusService = async (
     };
   }
 };
+const getUserBookedSlotsOfTutorService = async (
+  userId: string,
+  tutorId: string,
+) => {
+  try {
+    const bookedSlots = await prisma.booking.findMany({
+      where: {
+        tutorProfileId: tutorId,
+        studentId: userId,
+      },
+      include: {
+        slot: true,
+
+     
+        tutorSubject: {
+          select: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!bookedSlots) {
+      return {
+        success: false,
+        error: "No booked slots found for this tutor",
+      };
+    }
+    return {
+      success: true,
+      data: bookedSlots,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: (error as Error).message || "Failed to fetch booked slots",
+    };
+  }
+};
 
 export const bookingService = {
   createBookingService,
@@ -332,4 +377,5 @@ export const bookingService = {
   getAllBookingsService,
   updateBookingStatusService,
   updateBookingStatusByAdminService,
+  getUserBookedSlotsOfTutorService,
 };

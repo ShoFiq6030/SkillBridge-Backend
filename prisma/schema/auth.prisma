@@ -1,27 +1,26 @@
 model User {
   id              String        @id
   name            String
-  email           String
+  email           String        @unique
   emailVerified   Boolean       @default(false)
   image           String?       @default("https://res.cloudinary.com/dfz4ek2ub/image/upload/v1766300704/PH/PH-10/ladaenosgqi8pdhgyd9l.png")
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   role            String?       @default("USER")
   status          String?       @default("ACTIVE")
-  sessions        Session[]
   accounts        Account[]
-  tutorProfile    TutorProfile?
   studentBookings Booking[]     @relation("StudentBookings")
   studentReviews  Review[]      @relation("StudentReviews")
+  sessions        Session[]
+  tutorProfile    TutorProfile?
 
-  @@unique([email])
   @@map("user")
 }
 
 model Session {
   id        String   @id
   expiresAt DateTime
-  token     String
+  token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   ipAddress String?
@@ -29,7 +28,6 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
 
-  @@unique([token])
   @@index([userId])
   @@map("session")
 }
@@ -39,7 +37,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id])
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -49,6 +46,7 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@map("account")

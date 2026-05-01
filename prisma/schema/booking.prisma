@@ -1,29 +1,21 @@
 model Booking {
-  id String @id @default(uuid())
-
+  id             String           @id @default(uuid())
   tutorProfileId String
-  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
-
-  studentId String
-  student   User   @relation("StudentBookings", fields: [studentId], references: [id], onDelete: Cascade)
-
-  slotId String           @unique
-  slot   AvailabilitySlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
-
+  studentId      String
+  slotId         String           @unique
+  status         BookingStatus    @default(PENDING)
+  note           String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
   tutorSubjectId String
-  tutorSubject   TutorSubject @relation(fields: [tutorSubjectId], references: [id], onDelete: Cascade)
-
-  status BookingStatus @default(PENDING)
-  note   String?
-  price     Float @default(0)
-  currency  Currency  @default(USD)
-  payment Payment?
-  
-
-  review Review? @relation()
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  price          Float            @default(0)
+  currency       Currency         @default(USD)
+  slot           AvailabilitySlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  student        User             @relation("StudentBookings", fields: [studentId], references: [id], onDelete: Cascade)
+  tutorProfile   TutorProfile     @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+  tutorSubject   TutorSubject     @relation(fields: [tutorSubjectId], references: [id], onDelete: Cascade)
+  payment        Payment?      
+  review         Review?
 
   @@index([studentId])
   @@index([tutorProfileId])
@@ -32,8 +24,8 @@ model Booking {
 }
 
 enum BookingStatus {
-  PENDING
   CONFIRMED
   COMPLETED
   CANCELLED
+  PENDING
 }

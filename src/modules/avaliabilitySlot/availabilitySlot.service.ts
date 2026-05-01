@@ -30,7 +30,7 @@ const createAvailabilitySlot = async (
 
   const durationInMinutes =
     (payload.endAt.getTime() - payload.startAt.getTime()) / (1000 * 60); // duration in minutes
-  const durationInHours = Math.floor(durationInMinutes / 60); // duration in hours
+  const durationInHours = Math.ceil(durationInMinutes / 60); // duration in hours
 
   for (const slot of existingSlots) {
     if (payload.startAt < slot.endAt && payload.endAt > slot.startAt) {

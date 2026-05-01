@@ -12,12 +12,20 @@ import { reviewsRouter } from "./modules/reviews/reviews.router";
 import { adminRouter } from "./modules/admin/admin.routes";
 import { notFound } from "./middlewares/notfound";
 import errorHandler from "./middlewares/globalErrorHandler";
+import { paymentRouter } from "./modules/payment/payment.router";
+import { paymentController } from "./modules/payment/payment.controller";
 
 const app: Application = express();
 
+app.post(
+  "/api/payment/webhook",
+  express.raw({ type: "application/json" }),
+  paymentController.handleStripeWebhookEvent,
+);
+
 // Configure CORS to allow both production and Vercel preview deployments
 const allowedOrigins = [
-//  "http://localhost:3000",
+  //  "http://localhost:3000",
   process.env.FRONTEND_URL, // Production frontend URL
 ].filter(Boolean); // Remove undefined values
 
@@ -61,6 +69,7 @@ app.use("/api/tutor-subject", tutorSubjectRouter);
 app.use("/api/availability-slot", availabilitySlotRouter);
 app.use("/api/reviews", reviewsRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/payment", paymentRouter);
 
 // 404 handler for unmatched routes
 app.use(notFound);

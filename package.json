@@ -8,7 +8,8 @@
     "dev": "npx tsx watch src/server.ts",
     "build": "tsup",
     "postinstall": "prisma generate",
-    "start": "node api/index.js"
+    "start": "node api/index.js",
+    "stripe:webhook": "stripe listen --forward-to localhost:5000/api/payment/webhook"
   },
   "keywords": [],
   "author": "",
@@ -21,9 +22,9 @@
     "@types/nodemailer": "^7.0.11",
     "@types/pg": "^8.16.0",
     "prisma": "^7.4.2",
+    "tsup": "^8.5.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "tsup": "^8.5.1"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@prisma/adapter-neon": "^7.4.2",
@@ -34,6 +35,8 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "nodemailer": "^8.0.1",
-    "pg": "^8.18.0"
+    "pg": "^8.18.0",
+    "sslcommerz-lts": "^1.2.0",
+    "stripe": "^20.3.1"
   }
 }
