@@ -14,6 +14,8 @@ import { notFound } from "./middlewares/notfound";
 import errorHandler from "./middlewares/globalErrorHandler";
 import { paymentRouter } from "./modules/payment/payment.router";
 import { paymentController } from "./modules/payment/payment.controller";
+import pusherRoutes from "./modules/pusher/pusher.routes";
+import chatRoutes from "./modules/chat/chat.routes";
 
 const app: Application = express();
 
@@ -55,6 +57,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("Welcome to SkillBridge API!");
@@ -70,6 +73,8 @@ app.use("/api/availability-slot", availabilitySlotRouter);
 app.use("/api/reviews", reviewsRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/payment", paymentRouter);
+app.use("/api/chat", chatRoutes);
+app.use("/api/pusher", pusherRoutes);
 
 // 404 handler for unmatched routes
 app.use(notFound);

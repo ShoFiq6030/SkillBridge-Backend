@@ -1,0 +1,12 @@
+model Message {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  chatRoomId String
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+
+  senderId String
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id])
+
+  content String
+}

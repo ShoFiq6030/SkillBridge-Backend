@@ -192,6 +192,9 @@ export const createStripeCheckoutSessionService = async (
       tutorSubject: {
         include: { category: true },
       },
+      tutorProfile: {
+        select: { userId: true },
+      },
     },
   });
 
@@ -230,10 +233,11 @@ export const createStripeCheckoutSessionService = async (
     cancel_url: `${process.env.FRONTEND_URL}/payment-failed?providerTransactionId={CHECKOUT_SESSION_ID}`,
     metadata: {
       bookingId: booking.id,
-      userId: user.id,
+      tutorId: booking.tutorProfile.userId,
+      studentId: user.id,
     },
   });
-  console.log("Stripe session id:", session.id);
+  // console.log("Stripe session id:", session.id);
   if (!session.id) {
     throw new Error("Failed to create Stripe session");
   }
@@ -272,20 +276,30 @@ export const createStripeCheckoutSessionService = async (
 };
 
 const handlerStripeWebhookEvent = async (event: Stripe.Event) => {
-  //  console.log("event:",event);
+  console.log("📨 Webhook Event Received:", event.type);
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
 
       const providerTransactionId = session.id;
-      console.log("providerTransactionId:", providerTransactionId);
       const bookingId = session.metadata?.bookingId as string | undefined;
+      const tutorId = session.metadata?.tutorId as string;
+      const studentId = session.metadata?.studentId as string;
+
+      console.log("✅ Checkout Session Completed");
+      console.log("  📌 Session ID:", providerTransactionId);
+      console.log("  📘 Booking ID:", bookingId);
+      console.log("  👨‍🏫 Tutor ID:", tutorId);
+      console.log("  👨‍🎓 Student ID:", studentId);
+      console.log("  💳 Payment Status:", session.payment_status);
 
       if (!providerTransactionId) {
+        console.error("❌ Missing Stripe session id");
         return { message: "Missing Stripe session id" };
       }
 
       if (!bookingId) {
+        console.error("❌ Missing booking id");
         return { message: "Missing booking id" };
       }
 
@@ -293,7 +307,20 @@ const handlerStripeWebhookEvent = async (event: Stripe.Event) => {
         where: {
           bookingId,
         },
+        include: {
+          booking: {
+            include: {
+              student: true,
+              tutorProfile: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
+        },
       });
+      // console.log(payment);
 
       if (!payment) {
         console.error(`Payment record for booking ${bookingId} not found`);
@@ -332,6 +359,14 @@ const handlerStripeWebhookEvent = async (event: Stripe.Event) => {
             },
             data: {
               status: "CONFIRMED",
+            },
+          });
+
+          await tx.chatRoom.create({
+            data: {
+              bookingId,
+              studentId: studentId,
+              tutorId: payment.booking.tutorProfile.user.id,
             },
           });
         }

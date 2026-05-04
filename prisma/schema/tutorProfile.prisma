@@ -17,6 +17,7 @@ model TutorProfile {
   reviews         Review[]
   user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   subjects        TutorSubject[]
+  
 
   @@index([hourlyRate])
   @@index([avgRating])

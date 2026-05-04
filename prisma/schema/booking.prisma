@@ -16,6 +16,7 @@ model Booking {
   tutorSubject   TutorSubject     @relation(fields: [tutorSubjectId], references: [id], onDelete: Cascade)
   payment        Payment?      
   review         Review?
+   chatRoom ChatRoom?
 
   @@index([studentId])
   @@index([tutorProfileId])

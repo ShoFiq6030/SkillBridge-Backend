@@ -13,6 +13,9 @@ model User {
   studentReviews  Review[]      @relation("StudentReviews")
   sessions        Session[]
   tutorProfile    TutorProfile?
+  studentChats ChatRoom[] @relation("StudentChats")
+  tutorChats   ChatRoom[] @relation("TutorChats")
+  sentMessages Message[]  @relation("SentMessages")
 
   @@map("user")
 }

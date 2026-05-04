@@ -94,11 +94,17 @@ const createStripeCheckoutSession = async (
 };
 
 const handleStripeWebhookEvent = async (req: Request, res: Response) => {
+  console.log("🔔 Webhook endpoint hit!");
+  console.log("📍 Path: /api/payment/webhook");
+  
   const signature = req.headers["stripe-signature"] as string;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
 
+  console.log("🔑 Signature present:", !!signature);
+  console.log("🔐 Webhook secret present:", !!webhookSecret);
+
   if (!signature || !webhookSecret) {
-    console.error("Missing Stripe signature or webhook secret");
+    console.error("❌ Missing Stripe signature or webhook secret");
     return res
       .status(400)
       .json({ message: "Missing Stripe signature or webhook secret" });
@@ -107,9 +113,11 @@ const handleStripeWebhookEvent = async (req: Request, res: Response) => {
   let event;
 
   try {
+    console.log("🔄 Constructing event with signature verification...");
     event = stripe.webhooks.constructEvent(req.body, signature, webhookSecret);
+    console.log("✅ Event constructed:", event.type);
   } catch (error: any) {
-    console.error("Error processing Stripe webhook:", error);
+    console.error("❌ Error processing Stripe webhook:", error.message);
     return res.status(400).json({ message: "Error processing Stripe webhook" });
   }
 
