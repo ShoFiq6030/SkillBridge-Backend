@@ -8,6 +8,7 @@ const router = Router();
 
 // POST /api/pusher/auth
 router.post("/auth", auth(), (req: Request, res: Response) => {
+  console.log(req.cookies);
   const { socket_id, channel_name } = req.body;
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });

@@ -15,7 +15,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql", // or "mysql", "postgresql", ...etc
@@ -93,14 +92,12 @@ export const auth = betterAuth({
   },
   // account: { skipStateCookieCheck: true }, // solved redirect issue
   advanced: {
-    cookies: {
-      state: {
-        attributes: {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        },
-      },
+    useSecureCookies: true,
+    defaultCookieAttributes: {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      partitioned: true,
     },
   },
 

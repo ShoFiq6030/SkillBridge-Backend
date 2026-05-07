@@ -7,7 +7,7 @@ import { prisma } from "../../lib/prisma";
 export const createChatRoom = async (
   bookingId: string,
   studentId: string,
-  tutorId: string
+  tutorId: string,
 ) => {
   return prisma.chatRoom.upsert({
     where: { bookingId },
@@ -23,7 +23,7 @@ export const createChatRoom = async (
 // ── Get chat room by bookingId ─────────────────────────────────────────────
 export const getChatRoomByBookingId = async (
   bookingId: string,
-  userId: string
+  userId: string,
 ) => {
   const room = await prisma.chatRoom.findUnique({
     where: { bookingId },
@@ -41,7 +41,7 @@ export const getChatRoomByBookingId = async (
 // ── Get messages by chatRoomId ─────────────────────────────────────────────
 export const getMessagesByRoomId = async (
   chatRoomId: string,
-  userId: string
+  userId: string,
 ) => {
   const room = await prisma.chatRoom.findUnique({
     where: { id: chatRoomId },
@@ -67,7 +67,7 @@ export const getMessagesByRoomId = async (
 export const sendMessage = async (
   chatRoomId: string,
   senderId: string,
-  content: string
+  content: string,
 ) => {
   const room = await prisma.chatRoom.findUnique({
     where: { id: chatRoomId },
@@ -75,7 +75,8 @@ export const sendMessage = async (
 
   if (!room) return null;
 
-  const isParticipant = room.studentId === senderId || room.tutorId === senderId;
+  const isParticipant =
+    room.studentId === senderId || room.tutorId === senderId;
   if (!isParticipant) throw new Error("FORBIDDEN");
 
   const message = await prisma.message.create({
@@ -101,4 +102,37 @@ export const sendMessage = async (
   });
 
   return message;
+};
+
+export const getAllChatRoomsForUserService = async (userId: string) => {
+  console.log(userId);
+  const rooms = await prisma.chatRoom.findMany({
+    where: {
+      OR: [{ studentId: userId }, { tutorId: userId }],
+    },
+    include: {
+      booking: {
+        include: {
+          slot: true,
+          tutorSubject: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      },
+      student: {
+        select: { id: true, name: true, image: true },
+      },
+      tutor: {
+        select: { id: true, name: true, image: true },
+      },
+      messages:{
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      }
+    },
+  });
+  console.log(rooms);
+  return rooms;
 };

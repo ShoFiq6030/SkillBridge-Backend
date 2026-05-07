@@ -7,6 +7,8 @@ import auth from "../../middlewares/auth";
 const router = Router();
 
 router.get("/room/:bookingId", auth(), chatController.getChatRoom);
+router.get("/chat-rooms", auth(), chatController.getAllChatRoomsForUserController);
+
 router.get("/messages/:chatRoomId", auth(), chatController.getMessages);
 router.post("/messages", auth(), chatController.sendMessage);
 

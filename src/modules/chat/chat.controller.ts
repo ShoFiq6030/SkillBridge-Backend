@@ -96,3 +96,17 @@ export const sendMessage = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
+export const getAllChatRoomsForUserController = async (req: Request, res: Response) => {
+  try {
+    // console.log(req.user);
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const userId = req.user.id;
+    const rooms = await chatService.getAllChatRoomsForUserService(userId);
+
+    res.json({ success: true, data: rooms });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
